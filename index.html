@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Do NOT Press the Bomb</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <header>
+        <h1>DO NOT PRESS THE BOMB</h1>
+    </header>
+    <main>
+        <div class="cell" id="0" onclick="flipCell(0)"></div>
+        <div class="cell" id="1" onclick="flipCell(1)"></div>
+        <div class="cell" id="2" onclick="flipCell(2)"></div>
+        <div class="cell" id="3" onclick="flipCell(3)"></div>
+        <div class="cell" id="4" onclick="flipCell(4)"></div>
+        <div class="cell" id="5" onclick="flipCell(5)"></div>
+        <div class="cell" id="6" onclick="flipCell(6)"></div>
+    </main>
+    <footer>
+        Turno de Jugador 1
+    </footer>
+    <script>
+        let playerActive = 1;
+        footer = document.querySelector("footer");
+
+        function hideBomb() {
+            bombIndex = Math.floor(Math.random()*7);
+            bombCell = document.getElementById(`${bombIndex}`);
+        }
+
+        function flipCell(cellIndex){
+            const cell = document.getElementById(cellIndex);
+            cell.classList.remove("hidden");
+
+            if (cellIndex == bombIndex){
+                cell.innerHTML = "💣";
+                cell.style.backgroundColor = "#f00"
+                cell.classList.add("show");
+                setTimeout(finishGame, 100);
+            }
+            else {
+                cell.innerHTML = "🚩";
+                cell.style.backgroundColor = "#2a9d8f"
+                cell.classList.add("show");
+            }
+            changeTurn()
+        }
+
+        function changeTurn(){
+            (playerActive == 1) ? playerActive = 2 : playerActive = 1;
+            console.log(playerActive);
+            footer.textContent = `Turno de jugador ${playerActive}`
+        }
+
+        function finishGame(){
+            //changeTurn();
+            alert(`Jugador ${playerActive} ha Ganado`)
+        }
+
+        function initGame() {
+            hideBomb()
+        }
+
+        initGame()
+    </script>
+</body>
+</html>
