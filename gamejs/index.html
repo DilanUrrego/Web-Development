@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pokémon Battle</title>
+  <style>
+    /* CSS will go here */
+    body { font-family: Arial; text-align: center; }
+    .screen { margin: 20px; padding: 10px; border: 2px solid black; }
+    .pokemon-options img { width: 100px; cursor: pointer; }
+    .battle-screen { display: none; }
+    .health-bar { height: 20px; background: #ddd; margin: 10px; }
+    .health { height: 100%; background: green; }
+  </style>
+</head>
+<body>
+  <!-- Selection Screen -->
+  <div class="screen" id="selection-screen">
+    <h2>Player 1, Choose Your Pokémon!</h2>
+    <div class="pokemon-options">
+      <img src="https://www.solopress.com/blog/wp-content/uploads/2014/09/pikachu_epic_pose_by_dhencod-d55ji0n.png" onclick="selectPokemon('pikachu', 1)">
+      <img src="https://media.crocs.com/images/f_auto%2Cq_auto%2Cw_768%2Ch_768%2Cc_pad%2Cb_transparent/products/10010047_001_ALT100/jibbitz" onclick="selectPokemon('charmander', 1)">
+      <img src="https://cdn.memegenerator.es/descargar/31466993" onclick="selectPokemon('squirtle', 1)">
+    </div>
+  </div>
+
+  <!-- Battle Screen -->
+  <div class="screen battle-screen" id="battle-screen">
+    <h2>Battle!</h2>
+    <div>
+      <h3>Player 1: <span id="player1-name">Pikachu</span></h3>
+      <div class="health-bar"><div class="health" id="player1-health"></div></div>
+      <h3>Player 2: <span id="player2-name">Charmander</span></h3>
+      <div class="health-bar"><div class="health" id="player2-health"></div></div>
+    </div>
+    <div id="battle-log"></div>
+    <button onclick="attack()">Attack</button>
+    <button onclick="heal()">Heal (20 HP)</button>
+  </div>
+</body>
+<script>
+  // Game Data
+const pokemon = {
+  pikachu: { name: "Pikachu", hp: 100, attack: 25 },
+  charmander: { name: "Charmander", hp: 90, attack: 30 },
+  squirtle: { name: "Squirtle", hp: 110, attack: 20 }
+};
+
+let players = {
+  player1: null,
+  player2: null
+};
+
+let currentPlayer = 1;
+
+// Select Pokémon
+function selectPokemon(pokemonId, player) {
+  if (player === 1) {
+    players.player1 = { ...pokemon[pokemonId], maxHp: pokemon[pokemonId].hp };
+    document.getElementById("selection-screen").innerHTML = `
+      <h2>Player 2, Choose Your Pokémon!</h2>
+      <div class="pokemon-options">
+        ${Object.keys(pokemon).map(p => `
+          <img src="${p}.png" onclick="selectPokemon('${p}', 2)">
+        `).join('')}
+      </div>
+    `;
+  } else {
+    players.player2 = { ...pokemon[pokemonId], maxHp: pokemon[pokemonId].hp };
+    startBattle();
+  }
+}
+
+// Start Battle
+function startBattle() {
+  document.getElementById("selection-screen").style.display = "none";
+  document.getElementById("battle-screen").style.display = "block";
+  updateUI();
+}
+
+// Update Health Bars
+function updateUI() {
+  document.getElementById("player1-name").textContent = players.player1.name;
+  document.getElementById("player2-name").textContent = players.player2.name;
+  document.getElementById("player1-health").style.width = `${(players.player1.hp / players.player1.maxHp) * 100}%`;
+  document.getElementById("player2-health").style.width = `${(players.player2.hp / players.player2.maxHp) * 100}%`;
+}
+
+// Attack
+function attack() {
+  const attacker = currentPlayer === 1 ? players.player1 : players.player2;
+  const defender = currentPlayer === 1 ? players.player2 : players.player1;
+
+  defender.hp -= attacker.attack;
+  logBattle(`${attacker.name} attacks for ${attacker.attack} damage!`);
+
+  if (defender.hp <= 0) {
+    logBattle(`${defender.name} fainted! Player ${currentPlayer} wins!`);
+    disableButtons();
+  } else {
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    logBattle(`Player ${currentPlayer}'s turn.`);
+  }
+  updateUI();
+}
+
+// Heal
+function heal() {
+  const player = currentPlayer === 1 ? players.player1 : players.player2;
+  player.hp = Math.min(player.hp + 20, player.maxHp);
+  logBattle(`${player.name} healed 20 HP!`);
+  currentPlayer = currentPlayer === 1 ? 2 : 1;
+  logBattle(`Player ${currentPlayer}'s turn.`);
+  updateUI();
+}
+
+// Log Battle Messages
+function logBattle(message) {
+  const log = document.getElementById("battle-log");
+  log.innerHTML += `<p>${message}</p>`;
+  log.scrollTop = log.scrollHeight;
+}
+
+// Disable buttons after game ends
+function disableButtons() {
+  document.querySelectorAll("button").forEach(btn => btn.disabled = true);
+}
+</script>
+</html>
