@@ -1,0 +1,18 @@
+<header>
+        <h1>DO NOT PRESS THE BOMB</h1>
+    </header>
+    <main class="board">
+  <div 
+    *ngFor="let cell of cells; let i = index"
+    class="cell"
+    [style.backgroundColor]="cell.color"
+    (click)="flipCell(i)">
+    {{ cell.hidden ? '' : cell.value }}
+  </div>
+
+    </main>
+    <footer>
+        {{footerMessage}}
+    </footer>
+    
+<router-outlet />
